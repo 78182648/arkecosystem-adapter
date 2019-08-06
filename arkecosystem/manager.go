@@ -16,8 +16,8 @@ type WalletManager struct {
 	Log             *log.OWLogger                   //日志工具
 	ContractDecoder openwallet.SmartContractDecoder //智能合约解析器
 	Blockscanner    *ARKBlockScanner                //区块扫描器
-	Api     *Api //本地封装的http client
-	Context context.Context
+	Api             *Api                            //本地封装的http client
+	Context         context.Context
 }
 
 func NewWalletManager() *WalletManager {
@@ -31,7 +31,6 @@ func NewWalletManager() *WalletManager {
 	wm.Context = context.TODO()
 	return &wm
 }
-
 
 //GetAccountPendingTxCount
 func (wm *WalletManager) GetAccountPendingTxCount(address string) (uint64, error) {

@@ -2,6 +2,7 @@ package arkecosystem
 
 import (
 	"github.com/blocktree/arkecosystem-adapter/sdk/client"
+	"net/url"
 )
 
 const (
@@ -14,8 +15,8 @@ type Api struct {
 
 func NewApi(baseUrl string) *Api {
 	client2 := client.NewClient(nil)
-	//URL, _ := url.Parse(baseUrl + baseURLPath + "/")
-	//client2.BaseURL = URL
+	URL, _ := url.Parse(baseUrl + baseURLPath + "/")
+	client2.BaseURL = URL
 	Api :=&Api{
 		Client: client2,
 	}
