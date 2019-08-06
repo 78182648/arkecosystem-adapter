@@ -3,7 +3,6 @@ module github.com/blocktree/arkecosystem-adapter
 go 1.12
 
 require (
-	github.com/ArkEcosystem/go-crypto v0.0.0-20190722062238-aede09b1e2e7
 	github.com/asdine/storm v2.1.2+incompatible
 	github.com/astaxie/beego v1.11.1
 	github.com/blocktree/futurepia-adapter v1.0.12
