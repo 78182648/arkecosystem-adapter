@@ -206,7 +206,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	signature := openwallet.KeySignature{
 		EccType: decoder.wm.Config.CurveType,
 		Address: addr,
-		Message: string(hashBytes),
+		Message: hex.EncodeToString(hashBytes),
 	}
 	keySignList = append(keySignList, &signature)
 
@@ -252,8 +252,10 @@ func (decoder *TransactionDecoder) SignRawTransaction(wrapper openwallet.WalletD
 				return err
 			}
 
-			msg := []byte(keySignature.Message)
-
+			msg, err := hex.DecodeString(keySignature.Message)
+			if err != nil {
+				return err
+			}
 			sig, err := arkecosystem_txsigner.Default.SignTransactionHash(msg, keyBytes, decoder.wm.Config.CurveType)
 
 			if err != nil {

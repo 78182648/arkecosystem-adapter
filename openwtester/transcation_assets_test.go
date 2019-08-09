@@ -128,20 +128,31 @@ func TestTransfer(t *testing.T) {
 	//to := ""
 
 	address := []string{
-		"AHuTQ8J9cEBKkMdvpMPGjMt5aXNi7kt5gy",
+		//"AHuTQ8J9cEBKkMdvpMPGjMt5aXNi7kt5gy",
 		//"AQNKcZnjeB8Lgc9CkLC3tZyuvgBvRUEiec",
 		//"ARppp4adUpoRW9dk7Vn2gGUasNSesb4dhr",
 		//"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
 		//"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
 		//"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
+		"AKMarHenA3iAmWR5sjA3kVGPrt5rtNgcki",
+		"AMP7RdWDQG7Za9xW49crvVwBcEFmcELzwg",
+		"AP3yrFWvsor2zAjtjZRG1pkUCBi8oGho3e",
+		"Ab8ajWDzw36x6ZTd1AqR39hKhAvijogaok",
+		"AKvYaeap1JRPbwqc9u9GTpRPFt8yXU8rYW",
+		"AaesSb9pgurkvNkNq4mckRsovTvyUGRZis",
+		"AMD68p77gafMPa4q5wSgJwErezCKuviStj",
+		"AXt7pouNtvdG4L5p2k3n7KGWNsbZCGNZVE",
+		"AScugdDownPbJsfya4wnMUzxDZSDHzGr7H",
+		"ASYEVyGNHPN1BHYrx3qA27kd4SGJR9iq6g",
+
 	}
 
-    for i:=0 ; i< 1 ; i++{
+    for i:=0 ; i< 1; i++{
 
 	to := address[i %len(address)]
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "1", "", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.3", "", "", nil)
 	if err != nil {
 		return
 	}
