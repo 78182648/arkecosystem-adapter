@@ -8,7 +8,6 @@ import (
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/pkg/errors"
-	"math/big"
 	"time"
 )
 
@@ -277,15 +276,14 @@ func (bs *ARKBlockScanner) ExtractTransaction(block *client.Block, scanTargetFun
 		return result, err
 	}
 	if trans.Data == nil || len(trans.Data) == 0 {
-		return  result, nil
+		return result, nil
 	}
-	for _, v := range trans.Data {
-		v.BlockHeight = block.Height
-	}
+
 	transactionList = append(transactionList, trans.Data...)
 
 	if len(transactionList) != 0 {
 		for _, v := range transactionList {
+			v.BlockHeight = block.Height
 			resultTx, err := bs.changeTrans(&v, scanTargetFunc)
 			if err != nil {
 				bs.wm.Log.Std.Error("trans ID: %d, save unscan record failed. unexpected error: %v", v.Id, err.Error())
@@ -322,15 +320,15 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 	//switch txType {
 	//case successTxType:
 
-	amountDec := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Amount, 0), bs.wm.Decimal())
+	//amountDec :=
 	//if err != nil {
 	//	log.Error("amount get error,err = ", err, "tx:", v.ID)
 	//	return resultTx, err
 	//}
-	feeDec := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Fee, 0), bs.wm.Decimal())
+	//feeDec :=
 
-	amount := common.BigIntToDecimals(big.NewInt(amountDec.IntPart()), decimals).String()
-	fees := common.BigIntToDecimals(big.NewInt(feeDec.IntPart()), decimals).String()
+	amount := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Amount, 0), bs.wm.Decimal()).String()
+	fees := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Fee, 0), bs.wm.Decimal()).String()
 	from := string(v.Sender)
 	to := string(v.Recipient)
 
@@ -419,7 +417,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			Decimal:     decimals,
 			Status:      status,
 			Reason:      reason,
-			TxType:   v.Type,
+			TxType:      v.Type,
 			Confirm:     int64(trans.Confirmations),
 			//SubmitTime:  int64(block.Time),
 			ConfirmTime: int64(trans.Timestamp.Unix),
