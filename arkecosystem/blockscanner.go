@@ -161,12 +161,11 @@ func (bs *ARKBlockScanner) GetBalanceByAddress(address ...string) ([]*openwallet
 		//}
 		addressWallet, _, err := bs.wm.Api.Client.Wallets.Get(context.Background(), a)
 
-
 		if err == nil {
 
 			wallet := addressWallet.Data
-			balance ,err := common.StringValueToBigInt(wallet.Balance,10)
-			if err != nil{
+			balance, err := common.StringValueToBigInt(wallet.Balance, 10)
+			if err != nil {
 				continue
 			}
 			b := common.BigIntToDecimals(balance, bs.wm.Decimal())
@@ -267,25 +266,23 @@ func (bs *ARKBlockScanner) ExtractTransaction(block *client.Block, scanTargetFun
 	}
 	transactionList := make([]client.Transaction, 0)
 
-	for i := 0; i < 10000; i++ {
-		pageSize := 100
+	pageSize := 100
 
-		query := &client.PaginationBlock{Limit: pageSize, Page: i, BlockId: block.Id}
+	query := &client.PaginationBlock{Limit: pageSize, Page: 1, BlockId: block.Id}
 
-		trans, _, err := bs.wm.Api.Client.Transactions.ListByBlockId(context.Background(), query)
+	trans, _, err := bs.wm.Api.Client.Transactions.ListByBlockId(context.Background(), query)
 
-		if err != nil {
-			log.Errorf("cant find the transaction by height %d ,err : %s", block.Height, err.Error())
-			break
-		}
-		if trans.Data == nil || len(trans.Data) == 0 {
-			break
-		}
-		for _, v := range trans.Data {
-			v.BlockHeight = block.Height
-		}
-		transactionList = append(transactionList, trans.Data...)
+	if err != nil {
+		log.Errorf("cant find the transaction by height %d ,err : %s", block.Height, err.Error())
+		return result, err
 	}
+	if trans.Data == nil || len(trans.Data) == 0 {
+		return  result, nil
+	}
+	for _, v := range trans.Data {
+		v.BlockHeight = block.Height
+	}
+	transactionList = append(transactionList, trans.Data...)
 
 	if len(transactionList) != 0 {
 		for _, v := range transactionList {
@@ -325,12 +322,12 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 	//switch txType {
 	//case successTxType:
 
-	amountDec := common.BigIntToDecimals(big.NewInt(v.Amount), bs.wm.Decimal())
+	amountDec := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Amount, 0), bs.wm.Decimal())
 	//if err != nil {
 	//	log.Error("amount get error,err = ", err, "tx:", v.ID)
 	//	return resultTx, err
 	//}
-	feeDec := common.BigIntToDecimals(big.NewInt(v.Fee), bs.wm.Decimal())
+	feeDec := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Fee, 0), bs.wm.Decimal())
 
 	amount := common.BigIntToDecimals(big.NewInt(amountDec.IntPart()), decimals).String()
 	fees := common.BigIntToDecimals(big.NewInt(feeDec.IntPart()), decimals).String()
@@ -352,6 +349,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			IsContract: false,
 		}
 		input.Index = 0
+		input.TxType = v.Type
 		input.Sid = openwallet.GenTxInputSID(txID, bs.wm.Symbol(), "", uint64(0))
 		//input.CreateAt = createAt
 		input.BlockHeight = uint64(trans.BlockHeight)
@@ -387,6 +385,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			IsContract: false,
 		}
 		output.Index = 0
+		output.TxType = v.Type
 		output.Sid = openwallet.GenTxOutPutSID(txID, bs.wm.Symbol(), "", 0)
 		output.CreateAt = createAt
 		output.BlockHeight = uint64(v.BlockHeight)
@@ -420,6 +419,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			Decimal:     decimals,
 			Status:      status,
 			Reason:      reason,
+			TxType:   v.Type,
 			Confirm:     int64(trans.Confirmations),
 			//SubmitTime:  int64(block.Time),
 			ConfirmTime: int64(trans.Timestamp.Unix),

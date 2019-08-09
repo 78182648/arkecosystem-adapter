@@ -59,14 +59,14 @@ func TestSubscribeAddress_ARK(t *testing.T) {
 		endRunning = make(chan bool, 1)
 		symbol     = "ARK"
 		addrs = map[string]string{
-			"piajiahua": "sender",
+			"APfbzZ8Yx6qxViQ8pvFesUMFQzWAXPRXUU": "APfbzZ8Yx6qxViQ8pvFesUMFQzWAXPRXUU",
 			//"eostesterbob": "sender",
 		}
 	)
 
 	//GetSourceKeyByAddress 获取地址对应的数据源标识
 	scanAddressFunc := func(target openwallet.ScanTarget) (string, bool) {
-		key, ok := addrs[target.Alias]
+		key, ok := addrs[target.Address]
 		if !ok {
 			return "", false
 		}
@@ -103,6 +103,7 @@ func TestSubscribeAddress_ARK(t *testing.T) {
 		return
 	}
 
+	scanner.SetRescanBlockHeight(9263413)
 	scanner.SetBlockScanTargetFunc(scanAddressFunc)
 
 	sub := subscriberSingle{}

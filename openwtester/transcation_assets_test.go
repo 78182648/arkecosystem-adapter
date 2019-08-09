@@ -128,12 +128,12 @@ func TestTransfer(t *testing.T) {
 	//to := ""
 
 	address := []string{
-		"AHsrMmuUbfNfzHcz5mhV3BGiPqXobADiuc",
-		"AQNKcZnjeB8Lgc9CkLC3tZyuvgBvRUEiec",
-		"ARppp4adUpoRW9dk7Vn2gGUasNSesb4dhr",
-		"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
-		"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
-		"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
+		"AL8YN8rAmavynKrhSgVDUFaaU4oQEmvr8D",
+		//"AQNKcZnjeB8Lgc9CkLC3tZyuvgBvRUEiec",
+		//"ARppp4adUpoRW9dk7Vn2gGUasNSesb4dhr",
+		//"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
+		//"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
+		//"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
 	}
 
     for i:=0 ; i< 1 ; i++{
@@ -141,7 +141,7 @@ func TestTransfer(t *testing.T) {
 	to := address[i %len(address)]
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.3", "", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "10", "", "", nil)
 	if err != nil {
 		return
 	}

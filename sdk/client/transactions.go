@@ -40,6 +40,7 @@ func (s *TransactionsService) List(ctx context.Context, query *Pagination) (*Tra
 // Get all transactions.
 func (s *TransactionsService) ListByBlockId(ctx context.Context, query *PaginationBlock) (*Transactions, *http.Response, error) {
 	var responseStruct *Transactions
+	query.Page = 1
 	resp, err := s.client.SendRequest(ctx, "GET", "transactions", query, nil, &responseStruct)
 
 	if err != nil {
