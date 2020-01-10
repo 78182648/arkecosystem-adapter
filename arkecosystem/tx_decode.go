@@ -9,6 +9,7 @@ import (
 	"github.com/blocktree/arkecosystem-adapter/arkecosystem_txsigner"
 	"github.com/blocktree/arkecosystem-adapter/sdk/client"
 	"github.com/blocktree/arkecosystem-adapter/sdk/crypto"
+	"github.com/blocktree/go-owcrypt"
 	"github.com/blocktree/openwallet/common"
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
@@ -256,12 +257,19 @@ func (decoder *TransactionDecoder) SignRawTransaction(wrapper openwallet.WalletD
 			if err != nil {
 				return err
 			}
-			sig, err := arkecosystem_txsigner.Default.SignTransactionHash(msg, keyBytes, decoder.wm.Config.CurveType)
+			//sig, err := arkecosystem_txsigner.Default.SignTransactionHash(msg, keyBytes, decoder.wm.Config.CurveType)
+			//
+			//if err != nil {
+			//
+			//	return fmt.Errorf("sign transaction hash failed, unexpected err: %v", err)
+			//}
 
-			if err != nil {
 
-				return fmt.Errorf("sign transaction hash failed, unexpected err: %v", err)
+			sig,_, result := owcrypt.Signature(keyBytes, nil,  msg,   decoder.wm.Config.CurveType)
+			if result != owcrypt.SUCCESS {
+				return fmt.Errorf("sign transaction hash failed, unexpected err: %v", result)
 			}
+
 
 			keySignature.Signature = hex.EncodeToString(sig)
 		}
@@ -293,21 +301,17 @@ func (decoder *TransactionDecoder) VerifyRawTransaction(wrapper openwallet.Walle
 	for accountID, keySignatures := range rawTx.Signatures {
 		decoder.wm.Log.Debug("accountID Signatures:", accountID)
 		for _, keySignature := range keySignatures {
-			/**
-			msg  :=  []byte(keySignature.Message)
-			signature, _ := hex.DecodeString(keySignature.Signature)
-			publicKey, _ := hex.DecodeString(keySignature.Address.PublicKey)
 
-			pk,_ :=crypto.PublicKeyFromBytes(publicKey)
 
-			publickKey := owcrypt.PointDecompress(publicKey, owcrypt.ECC_CURVE_SECP256K1)
-			//验证签名
-			ret := owcrypt.Verify(publickKey[1:], nil, 0, msg, uint16(len(msg)), signature,decoder.wm.Config.CurveType)
-			if ret != owcrypt.SUCCESS {
-				return fmt.Errorf("serializableTransaction verify failed")
+			sig, err := hex.DecodeString(keySignature.Signature)
+			if err != nil {
+				return err
 			}
-			*/
-			serializableTransaction.Signature = keySignature.Signature
+
+			realSig := arkecosystem_txsigner.Default.SignSerialize(sig)
+
+
+			serializableTransaction.Signature = hex.EncodeToString(realSig)
 
 			verify, err := serializableTransaction.Verify()
 			if !verify || err != nil {

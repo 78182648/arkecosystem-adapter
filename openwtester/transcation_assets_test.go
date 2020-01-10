@@ -123,9 +123,7 @@ func TestTransfer(t *testing.T) {
 	accountID := "4bpD665trhfF69MeZQUj5hpCqogfetEwWoGTrRMSuxvV"
 	//accountID := "4bpD665trhfF69MeZQUj5hpCqogfetEwWoGTrRMSuxvV"
 	//to := "APWPMowFEb6KdVn9FRvdgdWZMVo1wmnwvp"
-
 	//accountID := "F7aeTnSdjEA16x4H3n1vPtDEo9Xp5Vus11pwY5QF6K3y"
-	//to := ""
 
 	address := []string{
 		//"AHuTQ8J9cEBKkMdvpMPGjMt5aXNi7kt5gy",
@@ -134,6 +132,7 @@ func TestTransfer(t *testing.T) {
 		//"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
 		//"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
 		//"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
+		"AYRoQKcqehgJnLRhZMtptfSKAzw2vkamuH",
 		"AKMarHenA3iAmWR5sjA3kVGPrt5rtNgcki",
 		"AMP7RdWDQG7Za9xW49crvVwBcEFmcELzwg",
 		"AP3yrFWvsor2zAjtjZRG1pkUCBi8oGho3e",
@@ -152,7 +151,7 @@ func TestTransfer(t *testing.T) {
 	to := address[i %len(address)]
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.3", "", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.1", "", "", nil)
 	if err != nil {
 		return
 	}

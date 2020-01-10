@@ -16,6 +16,7 @@
 package openwtester
 
 import (
+	"github.com/blocktree/openwallet/common/file"
 	"path/filepath"
 	"testing"
 
@@ -59,7 +60,7 @@ func TestSubscribeAddress_ARK(t *testing.T) {
 		endRunning = make(chan bool, 1)
 		symbol     = "ARK"
 		addrs = map[string]string{
-			"APfbzZ8Yx6qxViQ8pvFesUMFQzWAXPRXUU": "APfbzZ8Yx6qxViQ8pvFesUMFQzWAXPRXUU",
+			"AYRoQKcqehgJnLRhZMtptfSKAzw2vkamuH": "AYRoQKcqehgJnLRhZMtptfSKAzw2vkamuH",
 			//"eostesterbob": "sender",
 		}
 	)
@@ -94,18 +95,30 @@ func TestSubscribeAddress_ARK(t *testing.T) {
 		assetsLogger.SetLogFuncCall(true)
 	}
 
-	//log.Debug("already got scanner:", assetsMgr)
 	scanner := assetsMgr.GetBlockScanner()
-	//scanner.SetRescanBlockHeight(1763830)
+
 
 	if scanner == nil {
 		log.Error(symbol, "is not support block scan")
 		return
 	}
 
-	scanner.SetRescanBlockHeight(9263413)
-	scanner.SetBlockScanTargetFunc(scanAddressFunc)
+	var (
+		dbFilePath = filepath.Join("data", "db")
+		dbFileName = "blockchain-ARK.db"
+	)
 
+	if scanner.SupportBlockchainDAI() {
+		file.MkdirAll(dbFilePath)
+		dai, err := openwallet.NewBlockchainLocal(filepath.Join(dbFilePath, dbFileName), false)
+		if err != nil {
+			log.Error("NewBlockchainLocal err: %v", err)
+			return
+		}
+
+		scanner.SetBlockchainDAI(dai)
+	}
+	scanner.SetBlockScanTargetFunc(scanAddressFunc)
 	sub := subscriberSingle{}
 	scanner.AddObserver(&sub)
 

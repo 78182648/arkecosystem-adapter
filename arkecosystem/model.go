@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/blocktree/openwallet/common"
 	"github.com/blocktree/openwallet/crypto"
+	"github.com/blocktree/openwallet/openwallet"
 )
 
 
@@ -21,11 +22,11 @@ type UnscanRecord struct {
 	Reason      string
 }
 
-func NewUnscanRecord(height uint64, blockID, reason string) *UnscanRecord {
-	obj := UnscanRecord{}
+func NewUnscanRecord(height uint64, txID, reason string) *openwallet.UnscanRecord {
+	obj := openwallet.UnscanRecord{}
 	obj.BlockHeight = height
-	obj.BlockID = blockID
+	obj.TxID = txID
 	obj.Reason = reason
-	obj.ID = common.Bytes2Hex(crypto.SHA256([]byte(fmt.Sprintf("%d_%s", height, blockID))))
+	obj.ID = common.Bytes2Hex(crypto.SHA256([]byte(fmt.Sprintf("%d_%s", height, txID))))
 	return &obj
 }
