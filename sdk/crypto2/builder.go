@@ -5,7 +5,7 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-package crypto
+package crypto2
 
 func buildSignedTransaction(transaction *Transaction, passphrase string, secondPassphrase string) *Transaction {
 	transaction.Timestamp = GetTime()

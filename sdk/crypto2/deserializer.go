@@ -5,14 +5,14 @@
 // For the full copyright and license information, please view the LICENSE
 // file that was distributed with this source code.
 
-package crypto
+package crypto2
 
 import (
 	"encoding/binary"
 	"fmt"
 	"strconv"
 
-	"github.com/blocktree/arkecosystem-adapter/sdk/crypto/base58"
+	"github.com/blocktree/arkecosystem-adapter/sdk/crypto2/base58"
 )
 
 func DeserializeTransaction(serialized string) *Transaction {
