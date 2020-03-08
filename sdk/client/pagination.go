@@ -8,8 +8,6 @@
 package client
 
 type Pagination struct {
-	Page    int    `url:"page"`
-	Limit   int    `url:"limit"`
-	//Height  int    `url:"height"`
-	//BlockId string `url:"blockId"`
+	Page  int `url:"page"`
+	Limit int `url:"limit"`
 }

@@ -7,21 +7,30 @@
 
 package client
 
+import (
+	"github.com/blocktree/arkecosystem-adapter/sdk/crypto"
+	"time"
+)
+
 type Transaction struct {
-	Address       string            `json:"address,omitempty"`
-	Id            string            `json:"id,omitempty"`
-	BlockId       string            `json:"blockId,omitempty"`
-	BlockHeight   int64             `json:"-"`
-	Type          uint64              `json:"type,omitempty"`
-	Amount        string            `json:"amount,omitempty"`
-	Fee           string            `json:"fee,omitempty"`
-	Sender        string            `json:"sender,omitempty"`
-	Recipient     string            `json:"recipient,omitempty"`
-	Signature     string            `json:"signature,omitempty"`
-	VendorField   string            `json:"vendorField,omitempty"`
-	Asset         *TransactionAsset `json:"asset,omitempty"`
-	Confirmations uint16            `json:"confirmations,omitempty"`
-	Timestamp     Timestamp         `json:"timestamp,omitempty"`
+	Id          string           `json:"id,omitempty"`
+	BlockId     string           `json:"blockId,omitempty"`
+	BlockHeight int64            `json:"-"`
+	Version     byte             `json:"version,omitempty"`
+	Type        byte             `json:"type,omitempty"`
+	TypeGroup   uint16           `json:"typeGroup,omitempty"`
+	Fee         crypto.FlexToshi `json:"fee,omitempty"`
+	Amount      crypto.FlexToshi `json:"amount,omitempty"`
+	//Fee             crypto.FlexToshi            `json:"fee,omitempty,string"`
+	Sender          string            `json:"sender,omitempty"`
+	SenderPublicKey string            `json:"senderPublicKey,omitempty"`
+	Recipient       string            `json:"recipient,omitempty"`
+	Signature       string            `json:"signature,omitempty"`
+	Asset           *TransactionAsset `json:"asset,omitempty"`
+	VendorField     string            `json:"vendorField,omitempty"`
+	Confirmations   uint32            `json:"confirmations,omitempty"`
+	Timestamp       int32             `json:"timestamp,omitempty"`
+	Nonce           uint64            `json:"nonce,omitempty,string"`
 }
 
 type Transactions struct {
@@ -37,14 +46,26 @@ type GetCreateTransaction struct {
 	Data CreateTransaction `json:"data,omitempty"`
 }
 
+type TypeGroupTypes map[string]byte
+
 type TransactionTypes struct {
-	Data map[string]byte `json:"data,omitempty"`
+	Data map[string]TypeGroupTypes `json:"data,omitempty"`
+}
+
+type TransactionFees struct {
+	Data map[string]uint32 `json:"data,omitempty"`
 }
 
 type Timestamp struct {
 	Epoch int32  `json:"epoch,omitempty"`
 	Unix  int32  `json:"unix,omitempty"`
 	Human string `json:"human,omitempty"`
+}
+
+// Time parses the unix value of the timestamp and returns as time.Time object with
+// location as local.
+func (t Timestamp) Time() time.Time {
+	return time.Unix(int64(t.Unix), 0)
 }
 
 type CreateTransaction struct {
@@ -64,6 +85,7 @@ type TransactionAsset struct {
 	MultiSignature *MultiSignatureRegistrationAsset  `json:"multisignature,omitempty"`
 	Ipfs           *IpfsAsset                        `json:"ipfs,omitempty"`
 	Payments       []*MultiPaymentAsset              `json:"payments,omitempty"`
+	Claim          *ClaimAsset                       `json:"claim,omitempty"`
 }
 
 type SecondSignatureRegistrationAsset struct {
@@ -85,6 +107,11 @@ type IpfsAsset struct {
 }
 
 type MultiPaymentAsset struct {
-	Amount      uint64 `json:"amount,omitempty"`
+	Amount      uint64 `json:"amount,omitempty,string"`
 	RecipientId string `json:"recipientId,omitempty"`
+}
+
+type ClaimAsset struct {
+	LockTransactionId string `json:"lockTransactionId,omitempty"`
+	UnlockSecret      string `json:"unlockSecret,omitempty"`
 }

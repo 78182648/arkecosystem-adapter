@@ -10,8 +10,10 @@ require (
 	github.com/blocktree/go-owcrypt v1.1.1
 	github.com/blocktree/openwallet v1.7.0
 	github.com/btcsuite/btcd v0.20.1-beta
+	github.com/btcsuite/btcutil v0.0.0-20191219182022-e17c9730c422
 	github.com/fatih/structs v1.1.0
 	github.com/google/go-querystring v1.0.0
+	github.com/hbakhtiyor/schnorr v0.1.0
 	github.com/imroc/req v0.2.4
 	github.com/pelletier/go-toml v1.2.0
 	github.com/pkg/errors v0.8.1

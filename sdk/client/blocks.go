@@ -17,15 +17,6 @@ import (
 // methods of the Ark Core API - Version 2.
 type BlocksService Service
 
-type PaginationHeight struct {
-	Page    int    `url:"page"`
-	Limit   int    `url:"limit"`
-	Height  int    `url:"height"`
-	//BlockId string `url:"blockId"`
-}
-
-
-
 // Get all blocks.
 func (s *BlocksService) List(ctx context.Context, query *Pagination) (*Blocks, *http.Response, error) {
 	var responseStruct *Blocks
@@ -35,10 +26,15 @@ func (s *BlocksService) List(ctx context.Context, query *Pagination) (*Blocks, *
 		return nil, resp, err
 	}
 
-
 	return responseStruct, resp, err
 }
 
+type PaginationHeight struct {
+	Page    int    `url:"page"`
+	Limit   int    `url:"limit"`
+	Height  int    `url:"height"`
+	//BlockId string `url:"blockId"`
+}
 
 func (s *BlocksService) ListByHeight(ctx context.Context, query *PaginationHeight) (*Blocks, *http.Response, error) {
 	var responseStruct *Blocks
@@ -52,8 +48,11 @@ func (s *BlocksService) ListByHeight(ctx context.Context, query *PaginationHeigh
 	return responseStruct, resp, err
 }
 
+
+
+
 // Get a block by the given id.
-func (s *BlocksService) Get(ctx context.Context, id int) (*GetBlock, *http.Response, error) {
+func (s *BlocksService) Get(ctx context.Context, id int64) (*GetBlock, *http.Response, error) {
 	uri := fmt.Sprintf("blocks/%v", id)
 
 	var responseStruct *GetBlock
@@ -66,8 +65,33 @@ func (s *BlocksService) Get(ctx context.Context, id int) (*GetBlock, *http.Respo
 	return responseStruct, resp, err
 }
 
+// Get the first block.
+func (s *BlocksService) First(ctx context.Context) (*GetBlock, *http.Response, error) {
+	var responseStruct *GetBlock
+	resp, err := s.client.SendRequest(ctx, "GET", "blocks/first", nil, nil, &responseStruct)
+
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return responseStruct, resp, err
+}
+
+
+// Get the last block.
+func (s *BlocksService) Last(ctx context.Context) (*GetBlock, *http.Response, error) {
+	var responseStruct *GetBlock
+	resp, err := s.client.SendRequest(ctx, "GET", "blocks/last", nil, nil, &responseStruct)
+
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return responseStruct, resp, err
+}
+
 // Get all transactions by the given block.
-func (s *BlocksService) Transactions(ctx context.Context, id int, query *Pagination) (*GetBlockTransactions, *http.Response, error) {
+func (s *BlocksService) Transactions(ctx context.Context, id int64, query *Pagination) (*GetBlockTransactions, *http.Response, error) {
 	uri := fmt.Sprintf("blocks/%v/transactions", id)
 
 	var responseStruct *GetBlockTransactions

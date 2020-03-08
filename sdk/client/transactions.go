@@ -17,14 +17,6 @@ import (
 // methods of the Ark Core API - Version 2.
 type TransactionsService Service
 
-type PaginationBlock struct {
-	Page    int    `url:"page"`
-	Limit   int    `url:"limit"`
-	//Height  int    `url:"height"`
-	BlockId string `url:"blockId"`
-}
-
-
 // Get all transactions.
 func (s *TransactionsService) List(ctx context.Context, query *Pagination) (*Transactions, *http.Response, error) {
 	var responseStruct *Transactions
@@ -35,6 +27,24 @@ func (s *TransactionsService) List(ctx context.Context, query *Pagination) (*Tra
 	}
 
 	return responseStruct, resp, err
+}
+
+// Create a new transaction.
+func (s *TransactionsService) Create(ctx context.Context, body *CreateTransactionRequest) (*CreateTransaction, *http.Response, error) {
+	var responseStruct *CreateTransaction
+	resp, err := s.client.SendRequest(ctx, "POST", "transactions", nil, body, &responseStruct)
+
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return responseStruct, resp, err
+}
+type PaginationBlock struct {
+	Page    int    `url:"page"`
+	Limit   int    `url:"limit"`
+	//Height  int    `url:"height"`
+	BlockId string `url:"blockId"`
 }
 
 // Get all transactions.
@@ -65,19 +75,6 @@ func (s *TransactionsService) ListById(ctx context.Context, query *Pagination,id
 	return responseStruct, resp, err
 }
 
-
-
-// Create a new transaction.
-func (s *TransactionsService) Create(ctx context.Context, body *CreateTransactionRequest) (*CreateTransaction, *http.Response, error) {
-	var responseStruct *CreateTransaction
-	resp, err := s.client.SendRequest(ctx, "POST", "transactions", nil, body, &responseStruct)
-
-	if err != nil {
-		return nil, resp, err
-	}
-
-	return responseStruct, resp, err
-}
 
 // Get a transaction by the given id.
 func (s *TransactionsService) Get(ctx context.Context, id string) (*GetTransaction, *http.Response, error) {
@@ -142,3 +139,19 @@ func (s *TransactionsService) Types(ctx context.Context) (*TransactionTypes, *ht
 
 	return responseStruct, resp, err
 }
+
+// Get a list of static transaction fees.
+func (s *TransactionsService) Fees(ctx context.Context) (*TransactionFees, *http.Response, error) {
+	var responseStruct *TransactionFees
+	resp, err := s.client.SendRequest(ctx, "GET", "transactions/fees", nil, nil, &responseStruct)
+
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return responseStruct, resp, err
+}
+
+
+
+

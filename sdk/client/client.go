@@ -21,7 +21,7 @@ import (
 )
 
 const (
-	defaultBaseURL = "https://explorer.ark.io/api/"
+	defaultBaseURL = "https://dexplorer.ark.io:8443/api/"
 )
 
 type Client struct {
@@ -32,9 +32,13 @@ type Client struct {
 	common Service
 
 	Blocks       *BlocksService
+	Bridgechains *BridgechainsService
+	Businesses   *BusinessesService
 	Delegates    *DelegatesService
+	Locks        *LocksService
 	Node         *NodeService
 	Peers        *PeersService
+	Rounds       *RoundsService
 	Transactions *TransactionsService
 	Votes        *VotesService
 	Wallets      *WalletsService
@@ -55,9 +59,13 @@ func NewClient(httpClient *http.Client) *Client {
 	c.common.client = c
 
 	c.Blocks = (*BlocksService)(&c.common)
+	c.Bridgechains = (*BridgechainsService)(&c.common)
+	c.Businesses = (*BusinessesService)(&c.common)
 	c.Delegates = (*DelegatesService)(&c.common)
+	c.Locks = (*LocksService)(&c.common)
 	c.Node = (*NodeService)(&c.common)
 	c.Peers = (*PeersService)(&c.common)
+	c.Rounds = (*RoundsService)(&c.common)
 	c.Transactions = (*TransactionsService)(&c.common)
 	c.Votes = (*VotesService)(&c.common)
 	c.Wallets = (*WalletsService)(&c.common)

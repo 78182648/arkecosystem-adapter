@@ -23,9 +23,10 @@ func TestAddressFromPassphrase(t *testing.T) {
 }
 
 func TestValidateAddress(t *testing.T) {
-	//fixture := GetIdentityFixture()
+	fixture := GetIdentityFixture()
 
 	assert := assert.New(t)
-	resutl ,_:= ValidateAddress("DHmhHXSTYrorEmoiW8Aw89LFhUdEkwtidp")
-	assert.True(resutl)
+
+	assert.True(ValidateAddress(fixture.Data.Address))
+	assert.False(ValidateAddress("_"))
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/pkg/errors"
+	"math/big"
 	"time"
 )
 
@@ -106,6 +107,7 @@ func (bs *ARKBlockScanner) getBlockByHeight(height uint64) (*client.Block, error
 	return &result.Data[0], nil
 }
 
+
 //GetScannedBlockHeader 获取当前扫描的区块头
 func (bs *ARKBlockScanner) GetScannedBlockHeader() (*openwallet.BlockHeader, error) {
 
@@ -146,7 +148,7 @@ func (bs *ARKBlockScanner) GetCurrentBlockHeader() (*openwallet.BlockHeader, err
 	if err != nil {
 		return nil, err
 	}
-	return &openwallet.BlockHeader{Height: uint64(block.Height), Hash: string(block.Id)}, nil
+	return &openwallet.BlockHeader{Height: uint64(block.Height), Hash: block.Id}, nil
 }
 
 //GetBalanceByAddress 查询地址余额
@@ -159,14 +161,15 @@ func (bs *ARKBlockScanner) GetBalanceByAddress(address ...string) ([]*openwallet
 		//	Address: a,
 		//}
 		addressWallet, _, err := bs.wm.Api.Client.Wallets.Get(context.Background(), a)
-
 		if err == nil {
 
 			wallet := addressWallet.Data
-			balance, err := common.StringValueToBigInt(wallet.Balance, 10)
-			if err != nil {
-				continue
-			}
+			//balance, err := common.StringValueToBigInt(string(wallet.Balance), 10)
+			//if err != nil {
+			//	continue
+			//}
+
+			balance := big.NewInt(int64(wallet.Balance))
 			b := common.BigIntToDecimals(balance, bs.wm.Decimal())
 			ub := common.BigIntToDecimals(balance, bs.wm.Decimal())
 			obj := &openwallet.Balance{
@@ -175,6 +178,7 @@ func (bs *ARKBlockScanner) GetBalanceByAddress(address ...string) ([]*openwallet
 				Balance:          ub.String(),
 				UnconfirmBalance: ub.String(),
 				ConfirmBalance:   b.String(),
+
 			}
 
 			//log.Warn("address:",a,",ubalance:",ub.String(),"confirmBlance:",b.String())
@@ -311,7 +315,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 		extractData: make(map[string]*openwallet.TxExtractData),
 	}
 	var (
-		txID     = string(trans.Id)
+		txID     = trans.Id
 		createAt = time.Now().Unix()
 		//txType   = v.Type
 		decimals = bs.wm.Decimal()
@@ -326,11 +330,10 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 	//	return resultTx, err
 	//}
 	//feeDec :=
-
-	amount := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Amount, 0), bs.wm.Decimal()).String()
-	fees := common.BigIntToDecimals(common.StringNumToBigIntWithExp(v.Fee, 0), bs.wm.Decimal()).String()
-	from := string(v.Sender)
-	to := string(v.Recipient)
+	amount := common.IntToDecimals(int64(v.Amount),  bs.wm.Decimal()).String()
+	fees := common.IntToDecimals(int64(v.Fee),  bs.wm.Decimal()).String()
+	from := v.Sender
+	to := v.Recipient
 
 	sourceKey, ok := scanTargetFunc(
 		openwallet.ScanTarget{
@@ -340,14 +343,14 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 	if ok {
 		input := openwallet.TxInput{}
 		input.TxID = txID
-		input.Address = string(v.Sender)
+		input.Address = v.Sender
 		input.Amount = amount
 		input.Coin = openwallet.Coin{
 			Symbol:     bs.wm.Symbol(),
 			IsContract: false,
 		}
 		input.Index = 0
-		input.TxType = v.Type
+		input.TxType = uint64(v.Type)
 		input.Sid = openwallet.GenTxInputSID(txID, bs.wm.Symbol(), "", uint64(0))
 		//input.CreateAt = createAt
 		input.BlockHeight = uint64(trans.BlockHeight)
@@ -370,7 +373,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 
 	sourceKey2, ok2 := scanTargetFunc(
 		openwallet.ScanTarget{
-			Address:          string(v.Recipient),
+			Address:          v.Recipient,
 			BalanceModelType: openwallet.BalanceModelTypeAddress,
 		})
 	if ok2 {
@@ -383,7 +386,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			IsContract: false,
 		}
 		output.Index = 0
-		output.TxType = v.Type
+		output.TxType = uint64(v.Type)
 		output.Sid = openwallet.GenTxOutPutSID(txID, bs.wm.Symbol(), "", 0)
 		output.CreateAt = createAt
 		output.BlockHeight = uint64(v.BlockHeight)
@@ -417,10 +420,11 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			Decimal:     decimals,
 			Status:      status,
 			Reason:      reason,
-			TxType:      v.Type,
+			TxType:      uint64(v.Type),
 			Confirm:     int64(trans.Confirmations),
 			//SubmitTime:  int64(block.Time),
-			ConfirmTime: int64(trans.Timestamp.Unix),
+			//ConfirmTime: int64(trans.Timestamp.Unix),
+			ConfirmTime: int64(trans.Timestamp),
 		}
 		wxID := openwallet.GenTransactionWxID(tx)
 		tx.WxID = wxID

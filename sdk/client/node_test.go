@@ -26,7 +26,8 @@ func TestNodeService_Status(t *testing.T) {
 			  "data": {
 			    "synced": true,
 			    "now": 2399684,
-			    "blocksCount": -1346
+			    "blocksCount": -1346,
+			    "timestamp": 82359359
 			  }
 			}`)
 	})
@@ -39,6 +40,7 @@ func TestNodeService_Status(t *testing.T) {
 			Synced:      true,
 			Now:         2399684,
 			BlocksCount: -1346,
+			Timestamp:   82359359,
 		},
 	})
 }
@@ -90,8 +92,8 @@ func TestNodeService_Configuration(t *testing.T) {
 			    "explorer": "https://dexplorer.ark.io",
 			    "version": 30,
 			    "ports": {
-			      "@arkecosystem/core-p2p": "4002",
-			      "@arkecosystem/core-api": "4003"
+			      "@arkecosystem/core-p2p": 4002,
+			      "@arkecosystem/core-api": 4003
 			    },
 			    "constants": {
 			      "height": 75600,
@@ -105,55 +107,41 @@ func TestNodeService_Configuration(t *testing.T) {
 			      },
 			      "epoch": "2017-03-21T13:00:00.000Z",
 			      "fees": {
-			        "dynamic": false,
-			        "transfer": 10000000,
-			        "secondSignature": 500000000,
-			        "delegateRegistration": 2500000000,
-			        "vote": 100000000,
-			        "multiSignature": 500000000,
-			        "ipfs": 0,
-			        "timelockTransfer": 0,
-			        "multiPayment": 0,
-			        "delegateResignation": 0
-			      },
-			      "dynamicOffsets": {
-			        "transfer": 100,
-			        "secondSignature": 250,
-			        "delegateRegistration": 500,
-			        "vote": 100,
-			        "multiSignature": 500,
-			        "ipfs": 250,
-			        "timelockTransfer": 500,
-			        "multiPayment": 500,
-			        "delegateResignation": 500
+			        "staticFees": {
+			          "transfer": 10000000,
+			          "secondSignature": 500000000,
+			          "delegateRegistration": 2500000000,
+			          "vote": 100000000,
+			          "multiSignature": 500000000,
+			          "ipfs": 500000000,
+			          "multiPayment": 10000000,
+			          "delegateResignation": 2500000000,
+			          "htlcLock": 10000000,
+			          "htlcClaim": 0,
+			          "htlcRefund": 0
+			        }
 			      }
 			    },
-			    "feeStatistics": [
-			      {
-			        "type": 0,
-			        "fees": {
-			          "minFee": 10000000,
-			          "maxFee": 10000000,
-			          "avgFee": 10000000
-			        }
-			      },
-			      {
-			        "type": 1,
-			        "fees": {
-			          "minFee": 500000000,
-			          "maxFee": 500000000,
-			          "avgFee": 500000000
-			        }
-			      },
-			      {
-			        "type": 3,
-			        "fees": {
-			          "minFee": 100000000,
-			          "maxFee": 100000000,
-			          "avgFee": 100000000
+			    "transactionPool": {
+			      "dynamicFees": {
+			        "enabled": true,
+			        "minFeePool": 1000,
+			        "minFeeBroadcast": 1000,
+			        "addonBytes": {
+			          "transfer": 100,
+			          "secondSignature": 250,
+			          "delegateRegistration": 400000,
+			          "vote": 100,
+			          "multiSignature": 500,
+			          "ipfs": 250,
+			          "multiPayment": 500,
+			          "delegateResignation": 100,
+			          "htlcLock": 100,
+			          "htlcClaim": 0,
+			          "htlcRefund": 0
 			        }
 			      }
-			    ]
+			    }
 			  }
 			}`)
 	})
@@ -168,9 +156,9 @@ func TestNodeService_Configuration(t *testing.T) {
 			Symbol:   "DѦ",
 			Explorer: "https://dexplorer.ark.io",
 			Version:  30,
-			Ports: map[string]string{
-				"@arkecosystem/core-p2p": "4002",
-				"@arkecosystem/core-api": "4003",
+			Ports: map[string]int16{
+				"@arkecosystem/core-p2p": 4002,
+				"@arkecosystem/core-api": 4003,
 			},
 			Constants: NodeConstants{
 				Height:          75600,
@@ -183,52 +171,109 @@ func TestNodeService_Configuration(t *testing.T) {
 					MaxPayload:      2097152,
 				},
 				Epoch: "2017-03-21T13:00:00.000Z",
-				Fees: FeeTypes{
-					Dynamic:              false,
-					Transfer:             10000000,
-					SecondSignature:      500000000,
-					DelegateRegistration: 2500000000,
-					Vote:                 100000000,
-					MultiSignature:       500000000,
-					Ipfs:                 0,
-					TimelockTransfer:     0,
-					MultiPayment:         0,
-					DelegateResignation:  0,
-				},
-				DynamicOffsets: DynamicFeeOffsets{
-					Transfer:             100,
-					SecondSignature:      250,
-					DelegateRegistration: 500,
-					Vote:                 100,
-					MultiSignature:       500,
-					Ipfs:                 250,
-					TimelockTransfer:     500,
-					MultiPayment:         500,
-					DelegateResignation:  500,
+				Fees: map[string]FeeTypes{
+					"staticFees": FeeTypes{
+						Transfer:             10000000,
+						SecondSignature:      500000000,
+						DelegateRegistration: 2500000000,
+						Vote:                 100000000,
+						MultiSignature:       500000000,
+						Ipfs:                 500000000,
+						MultiPayment:         10000000,
+						DelegateResignation:  2500000000,
+						HtlcLock:             10000000,
+						HtlcClaim:            0,
+						HtlcRefund:           0,
+					},
 				},
 			},
-			FeeStatistics: []FeeStatistic{{
-				Type: 0,
-				Fees: Fees{
-					MinFee: 10000000,
-					MaxFee: 10000000,
-					MvgFee: 10000000,
+			TransactionPool: NodeTransactionPool{
+				DynamicFees: DynamicFees{
+					Enabled:         true,
+					MinFeePool:      1000,
+					MinFeeBroadcast: 1000,
+					AddonBytes: FeeTypes{
+						Transfer:             100,
+						SecondSignature:      250,
+						DelegateRegistration: 400000,
+						Vote:                 100,
+						MultiSignature:       500,
+						Ipfs:                 250,
+						MultiPayment:         500,
+						DelegateResignation:  100,
+						HtlcLock:             100,
+						HtlcClaim:            0,
+						HtlcRefund:           0,
+					},
 				},
-			}, {
-				Type: 1,
-				Fees: Fees{
-					MinFee: 500000000,
-					MaxFee: 500000000,
-					MvgFee: 500000000,
-				},
-			}, {
-				Type: 3,
-				Fees: Fees{
-					MinFee: 100000000,
-					MaxFee: 100000000,
-					MvgFee: 100000000,
-				},
-			}},
+			},
 		},
+	})
+}
+
+// Get the node fee statistics.
+func TestNodeService_Fees(t *testing.T) {
+	client, mux, _, teardown := setupTest()
+	defer teardown()
+
+	mux.HandleFunc("/node/fees", func(writer http.ResponseWriter, request *http.Request) {
+		testMethod(t, request, "GET")
+		fmt.Fprint(writer,
+			`{
+			  "data": [
+			    {
+			      "type": 0,
+			      "min": "10000000",
+			      "max": "10000000",
+			      "avg": "10000000",
+			      "sum": "10000000",
+			      "median": "10000000"
+			    },
+			    {
+			      "type": 1,
+			      "min": "500000000",
+			      "max": "500000000",
+			      "avg": "500000000",
+			      "sum": "500000000",
+			      "median": "500000000"
+			    },
+			    {
+			      "type": 3,
+			      "min": "100000000",
+			      "max": "100000000",
+			      "avg": "100000000",
+			      "sum": "100000000",
+			      "median": "100000000"
+			    }
+			  ]
+			}`)
+	})
+
+	responseStruct, response, err := client.Node.Fees(context.Background(), 7)
+	testGeneralError(t, "Node.Fees", err)
+	testResponseUrl(t, "Node.Fees", response, "/api/node/fees?days=7")
+	testResponseStruct(t, "Node.Fees", responseStruct, &GetNodeFees{
+		Data: []FeeStatistic{{
+			Type:   0,
+			MinFee: 10000000,
+			MaxFee: 10000000,
+			AvgFee: 10000000,
+			SumFee: 10000000,
+			MdnFee: 10000000,
+		}, {
+			Type:   1,
+			MinFee: 500000000,
+			MaxFee: 500000000,
+			AvgFee: 500000000,
+			SumFee: 500000000,
+			MdnFee: 500000000,
+		}, {
+			Type:   3,
+			MinFee: 100000000,
+			MaxFee: 100000000,
+			AvgFee: 100000000,
+			SumFee: 100000000,
+			MdnFee: 100000000,
+		}},
 	})
 }

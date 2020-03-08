@@ -1,7 +1,7 @@
 package arkecosystem_addrec
 
 import (
-	"github.com/blocktree/arkecosystem-adapter/sdk/crypto"
+	"github.com/blocktree/arkecosystem-adapter/sdk/crypto2"
 	"github.com/blocktree/openwallet/log"
 )
 
@@ -18,7 +18,7 @@ type AddressDecoderV2 struct {
 func GetAddressFromPublicKey(publicKey []byte) string {
 	//publicKeyHash := sha256.Sum256(publicKey)
 
-	pk, err := crypto.PublicKeyFromBytes(publicKey)
+	pk, err := crypto2.PublicKeyFromBytes(publicKey)
 	if err != nil {
 		log.Error(err)
 	}

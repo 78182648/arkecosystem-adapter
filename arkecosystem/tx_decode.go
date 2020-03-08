@@ -182,8 +182,16 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	//if err != nil {
 	//	return err
 	//}
+	addressWallet, _, err := decoder.wm.Api.Client.Wallets.Get(context.Background(),  addr.Address)
 
-	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address)
+	if err != nil{
+		return err
+	}
+
+
+	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address,addressWallet.Data.Nonce)
+
+
 
 	txRaw, err := transaction.ToJson()
 	if err != nil {
@@ -193,7 +201,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	rawTx.RawHex = string(txRaw)
 
 	bytes := sha256.New()
-	_, err = bytes.Write(transaction.ToBytes(true, true))
+	_, err = bytes.Write(transaction.Serialize(false, false,false))
 	if err != nil {
 		return err
 	}
@@ -342,35 +350,24 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 		return nil, fmt.Errorf("serializableTransaction decode failed, unexpected error: %v", err)
 	}
 
-	result, _ := serializableTransaction.Verify()
-	log.Warn("veri:", result)
-	//senderPk, err := hex.DecodeString(serializableTransaction.SenderPublicKey)
-	//if err != nil {
-	//	return nil,err
-	//}
-	//sig, err := hex.DecodeString(serializableTransaction.Signature)
-	//if err != nil {
-	//	return nil,err
-	//}
-	// create the SpendTransaction
-	//transaction := &transactions.Transaction{
-	//	Type:            0,
-	//	Amount:         serializableTransaction.Amount,
-	//	RecipientID:     serializableTransaction.RecipientID,
-	//	Timestamp:       serializableTransaction.Timestamp,
-	//	SenderPublicKey: senderPk,
-	//	Signature:sig,
-	//}
 
-	//tm := time.Unix(int64(serializableTransaction.Timestamp), 0)
 	rawTx.TxID = serializableTransaction.GetId()
 	serializableTransaction.Id = rawTx.TxID
-	trans := make([]crypto.Transaction,0)
-	trans = append(trans, serializableTransaction)
-	rawTx.TxID = serializableTransaction.GetId()
+	trans := make([]client.Transaction,0)
+
+	var clientTransaction client.Transaction
+	err = json.Unmarshal(transJson, &clientTransaction)
+	if err != nil {
+		return nil, fmt.Errorf("clientTransaction decode failed, unexpected error: %v", err)
+	}
+	clientTransaction.Id = rawTx.TxID
+
+
+	trans = append(trans, clientTransaction)
 	body := &client.CreateTransactionRequest{
 		Transactions: trans,
 	}
+
 
 	responseStruct, _, err := decoder.wm.Api.Client.Transactions.Create(context.Background(), body)
 
