@@ -91,7 +91,7 @@ type Transaction struct {
 	Expiration            uint32            `json:"expiration,omitempty"`
 	Fee                   FlexToshi         `json:"fee,omitempty"`
 	Id                    string            `json:"id,omitempty"`
-	SenderId              string            `json:"-"`
+	SenderId              string            `json:"senderId,omitempty"`
 	Network               byte              `json:"network,omitempty"`
 	Nonce                 uint64            `json:"nonce,omitempty,string"`
 	RecipientId           string            `json:"recipientId,omitempty"`

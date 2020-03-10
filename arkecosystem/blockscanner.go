@@ -424,7 +424,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 			Confirm:     int64(trans.Confirmations),
 			//SubmitTime:  int64(block.Time),
 			//ConfirmTime: int64(trans.Timestamp.Unix),
-			ConfirmTime: int64(trans.Timestamp),
+			ConfirmTime: int64(trans.Timestamp.Unix),
 		}
 		wxID := openwallet.GenTransactionWxID(tx)
 		tx.WxID = wxID

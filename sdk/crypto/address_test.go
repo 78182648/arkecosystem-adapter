@@ -29,4 +29,6 @@ func TestValidateAddress(t *testing.T) {
 
 	assert.True(ValidateAddress(fixture.Data.Address))
 	assert.False(ValidateAddress("_"))
+
+
 }

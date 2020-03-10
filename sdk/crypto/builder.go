@@ -31,11 +31,10 @@ func BuildTransferMySelf(recipient string, amount FlexToshi, senderpk string, se
 	transaction := &Transaction{
 		SenderPublicKey: senderpk,
 		SenderId:        senderid,
-		Nonce:           nonce+1,
-		//Version:         2,
-		Amount:          amount,
-		//Expiration:      4333222,
-		RecipientId:     recipient,
+		Nonce:           nonce + 1,
+		Expiration:      4333222,
+		Amount: amount,
+		RecipientId: recipient,
 	}
 
 	setCommonFields(transaction, TRANSACTION_TYPES.Transfer)

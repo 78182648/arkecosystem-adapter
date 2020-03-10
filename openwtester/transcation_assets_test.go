@@ -151,7 +151,7 @@ func TestTransfer(t *testing.T) {
 	to := address[i %len(address)]
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.1", "", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.2", "", "", nil)
 	if err != nil {
 		return
 	}

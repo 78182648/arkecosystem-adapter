@@ -13,6 +13,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"net/http"
 	"net/url"
 	"strings"
@@ -88,6 +89,8 @@ func (c *Client) SendRequest(ctx context.Context, method string, urlStr string, 
 	if body != nil {
 		if method == "POST" {
 			json, _ := json.Marshal(body)
+			s := string(json)
+			fmt.Println(s)
 			buf = bytes.NewBuffer(json)
 		}
 	}
@@ -147,7 +150,15 @@ func (c *Client) SendRequest(ctx context.Context, method string, urlStr string, 
 			err = decErr
 		}
 	}
+	body2, err2 := ioutil.ReadAll(resp.Body)
+	if err2 != nil {
+		fmt.Println("myHttpGet error is ", err)
+		return nil,err2
+	}
 
+	fmt.Println("response statuscode is ", resp.StatusCode,
+		"\nhead[name]=", resp.Header["Name"],
+		"\nbody is ", string(body2))
 	defer resp.Body.Close()
 
 	return resp, err

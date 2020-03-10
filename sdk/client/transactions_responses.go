@@ -8,20 +8,19 @@
 package client
 
 import (
-	"github.com/blocktree/arkecosystem-adapter/sdk/crypto"
 	"time"
 )
 
+
 type Transaction struct {
-	Id          string           `json:"id,omitempty"`
-	BlockId     string           `json:"blockId,omitempty"`
-	BlockHeight int64            `json:"-"`
-	Version     byte             `json:"version,omitempty"`
-	Type        byte             `json:"type,omitempty"`
-	TypeGroup   uint16           `json:"typeGroup,omitempty"`
-	Fee         crypto.FlexToshi `json:"fee,omitempty"`
-	Amount      crypto.FlexToshi `json:"amount,omitempty"`
-	//Fee             crypto.FlexToshi            `json:"fee,omitempty,string"`
+	BlockHeight     int64             `json:"-"`
+	Id              string            `json:"id,omitempty"`
+	BlockId         string            `json:"blockId,omitempty"`
+	Version         byte              `json:"version,omitempty"`
+	Type            byte              `json:"type,omitempty"`
+	TypeGroup       uint16            `json:"typeGroup,omitempty"`
+	Amount          uint64            `json:"amount,omitempty,string"`
+	Fee             uint64            `json:"fee,omitempty,string"`
 	Sender          string            `json:"sender,omitempty"`
 	SenderPublicKey string            `json:"senderPublicKey,omitempty"`
 	Recipient       string            `json:"recipient,omitempty"`
@@ -29,7 +28,7 @@ type Transaction struct {
 	Asset           *TransactionAsset `json:"asset,omitempty"`
 	VendorField     string            `json:"vendorField,omitempty"`
 	Confirmations   uint32            `json:"confirmations,omitempty"`
-	Timestamp       int32             `json:"timestamp,omitempty"`
+	Timestamp       Timestamp         `json:"timestamp,omitempty"`
 	Nonce           uint64            `json:"nonce,omitempty,string"`
 }
 
