@@ -32,7 +32,6 @@ func BuildTransferMySelf(recipient string, amount FlexToshi, senderpk string, se
 		SenderPublicKey: senderpk,
 		SenderId:        senderid,
 		Nonce:           nonce + 1,
-		Expiration:      4333222,
 		Amount: amount,
 		RecipientId: recipient,
 	}

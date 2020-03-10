@@ -16,11 +16,10 @@
 package openwtester
 
 import (
-	"github.com/blocktree/openwallet/openw"
-	"testing"
-
 	"github.com/blocktree/openwallet/log"
+	"github.com/blocktree/openwallet/openw"
 	"github.com/blocktree/openwallet/openwallet"
+	"testing"
 )
 
 func testGetAssetsAccountBalance(tm *openw.WalletManager, walletID, accountID string) {
@@ -117,6 +116,7 @@ func testSubmitTransactionStep(tm *openw.WalletManager, rawTx *openwallet.RawTra
 	return rawTx, nil
 }
 
+
 func TestTransfer(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WMSVS51x4XgWNgd354yxd4yC7CrESsA8dN"
@@ -126,32 +126,19 @@ func TestTransfer(t *testing.T) {
 	//accountID := "F7aeTnSdjEA16x4H3n1vPtDEo9Xp5Vus11pwY5QF6K3y"
 
 	address := []string{
-		//"AHuTQ8J9cEBKkMdvpMPGjMt5aXNi7kt5gy",
-		//"AQNKcZnjeB8Lgc9CkLC3tZyuvgBvRUEiec",
-		//"ARppp4adUpoRW9dk7Vn2gGUasNSesb4dhr",
-		//"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
-		//"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
-		//"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
-		"AbVCQPf4PYfkk3yWbAb5V1MXM8uYQ5Ndu6",
-		"AKMarHenA3iAmWR5sjA3kVGPrt5rtNgcki",
-		"AMP7RdWDQG7Za9xW49crvVwBcEFmcELzwg",
-		"AP3yrFWvsor2zAjtjZRG1pkUCBi8oGho3e",
-		"Ab8ajWDzw36x6ZTd1AqR39hKhAvijogaok",
-		"AKvYaeap1JRPbwqc9u9GTpRPFt8yXU8rYW",
-		"AaesSb9pgurkvNkNq4mckRsovTvyUGRZis",
-		"AMD68p77gafMPa4q5wSgJwErezCKuviStj",
-		"AXt7pouNtvdG4L5p2k3n7KGWNsbZCGNZVE",
-		"AScugdDownPbJsfya4wnMUzxDZSDHzGr7H",
-		"ASYEVyGNHPN1BHYrx3qA27kd4SGJR9iq6g",
+		"AQNKcZnjeB8Lgc9CkLC3tZyuvgBvRUEiec",
+		"ARppp4adUpoRW9dk7Vn2gGUasNSesb4dhr",
+		"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
+		"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
+		"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
 
 	}
 
-    for i:=0 ; i< 1; i++{
-
+    for i:=0 ; i< len(address); i++{
 	to := address[i %len(address)]
 	testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.2", "", "", nil)
+	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.1", "", "", nil)
 	if err != nil {
 		return
 	}

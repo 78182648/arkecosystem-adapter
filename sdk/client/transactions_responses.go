@@ -11,7 +11,6 @@ import (
 	"time"
 )
 
-
 type Transaction struct {
 	BlockHeight     int64             `json:"-"`
 	Id              string            `json:"id,omitempty"`
@@ -29,6 +28,20 @@ type Transaction struct {
 	VendorField     string            `json:"vendorField,omitempty"`
 	Confirmations   uint32            `json:"confirmations,omitempty"`
 	Timestamp       Timestamp         `json:"timestamp,omitempty"`
+	Nonce           uint64            `json:"nonce,omitempty,string"`
+}
+
+type Transaction2 struct {
+	Id              string            `json:"id,omitempty"`
+	BlockId         string            `json:"blockId,omitempty"`
+	Version         uint16            `json:"version,omitempty"`
+	Type            uint16            `json:"type"`
+	TypeGroup       uint16            `json:"typeGroup,omitempty"`
+	Amount          uint64            `json:"amount,omitempty,string"`
+	Fee             uint64            `json:"fee,omitempty,string"`
+	SenderPublicKey string            `json:"senderPublicKey,omitempty"`
+	RecipientId     string            `json:"recipientId,omitempty"`
+	Signature       string            `json:"signature,omitempty"`
 	Nonce           uint64            `json:"nonce,omitempty,string"`
 }
 

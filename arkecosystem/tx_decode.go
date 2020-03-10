@@ -11,11 +11,13 @@ import (
 	"github.com/blocktree/arkecosystem-adapter/sdk/crypto"
 	"github.com/blocktree/go-owcrypt"
 	"github.com/blocktree/openwallet/common"
+	ow "github.com/blocktree/openwallet/common"
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/shopspring/decimal"
 	"math/big"
 	"sort"
+	"strconv"
 	"time"
 )
 
@@ -107,14 +109,26 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 	if findAddrBalance == nil {
 		return fmt.Errorf("all address's balance of account is not enough")
 	}
-
+	var nonce uint64
+	//获取db记录的nonce并确认nonce值
+	nonce_db, err := wrapper.GetAddressExtParam(findAddrBalance.Address, decoder.wm.FullName())
+	if err != nil {
+		return err
+	}
+	//判断nonce_db是否为空,为空则说明当前nonce是0
+	if nonce_db == nil {
+		nonce = 0
+	} else {
+		nonce = ow.NewString(nonce_db).UInt64()
+	}
+	nonce = nonce + 1
 	//最后创建交易单
 	err = decoder.createRawTransaction(
 		wrapper,
 		rawTx,
 		findAddrBalance,
 		fixFees,
-		"")
+		"", &nonce)
 	if err != nil {
 		return err
 	}
@@ -129,7 +143,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	rawTx *openwallet.RawTransaction,
 	addrBalance *openwallet.Balance,
 	feeInfo *big.Int,
-	callData string) error {
+	callData string, nonce *uint64) error {
 
 	var (
 		accountTotalSent = decimal.Zero
@@ -182,13 +196,18 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	//if err != nil {
 	//	return err
 	//}
+
 	addressWallet, _, err := decoder.wm.Api.Client.Wallets.Get(context.Background(), addr.Address)
 
 	if err != nil {
 		return err
 	}
+	if nonce == nil {
 
-	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address, addressWallet.Data.Nonce+1)
+		nonce = &addressWallet.Data.Nonce
+	}
+
+	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address, *nonce)
 
 	txRaw, err := transaction.ToJson()
 	if err != nil {
@@ -213,6 +232,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 		EccType: decoder.wm.Config.CurveType,
 		Address: addr,
 		Message: hex.EncodeToString(hashBytes),
+		Nonce:   strconv.FormatUint(*nonce, 10),
 	}
 	keySignList = append(keySignList, &signature)
 
@@ -345,45 +365,19 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 
 	rawTx.TxID = serializableTransaction.GetId()
 	serializableTransaction.Id = rawTx.TxID
-	trans := make([]client.Transaction, 0)
-	clientTransaction := client.Transaction{
+	trans := make([]client.Transaction2, 0)
+	clientTransaction := client.Transaction2{
 		//Id:              serializableTransaction.Id,
-		Version:         serializableTransaction.Version,
+		Version:         uint16(serializableTransaction.Version),
 		TypeGroup:       1,
-		Type:            byte(serializableTransaction.Type),
+		Type:            uint16(serializableTransaction.Type),
 		Amount:          uint64(serializableTransaction.Amount),
 		Fee:             uint64(serializableTransaction.Fee),
-		Sender:          serializableTransaction.SenderId,
 		SenderPublicKey: serializableTransaction.SenderPublicKey,
-		Recipient:       serializableTransaction.RecipientId,
+		RecipientId:     serializableTransaction.RecipientId,
 		Signature:       serializableTransaction.Signature,
-		VendorField:     serializableTransaction.VendorField,
 		Nonce:           serializableTransaction.Nonce,
 	}
-	//err = json.Unmarshal(transJson, &clientTransaction)
-	//if err != nil {
-	//	return nil, fmt.Errorf("clientTransaction decode failed, unexpected error: %v", err)
-	//}
-	//
-	//type Transaction struct {
-	//	BlockHeight     int64             `json:"-"`
-	//	Id              string            `json:"id,omitempty"`
-	//	BlockId         string            `json:"blockId,omitempty"`
-	//	Version         byte              `json:"version,omitempty"`
-	//	Type            byte              `json:"type,omitempty"`
-	//	TypeGroup       uint16            `json:"typeGroup,omitempty"`
-	//	Amount          uint64            `json:"amount,omitempty,string"`
-	//	Fee             uint64            `json:"fee,omitempty,string"`
-	//	Sender          string            `json:"sender,omitempty"`
-	//	SenderPublicKey string            `json:"senderPublicKey,omitempty"`
-	//	Recipient       string            `json:"recipient,omitempty"`
-	//	Signature       string            `json:"signature,omitempty"`
-	//	Asset           *TransactionAsset `json:"asset,omitempty"`
-	//	VendorField     string            `json:"vendorField,omitempty"`
-	//	Confirmations   uint32            `json:"confirmations,omitempty"`
-	//	Timestamp       Timestamp         `json:"timestamp,omitempty"`
-	//	Nonce           uint64            `json:"nonce,omitempty,string"`
-	//}
 
 	clientTransaction.Id = rawTx.TxID
 
@@ -394,7 +388,6 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 
 	responseStruct, _, err := decoder.wm.Api.Client.Transactions.Create(context.Background(), body)
 
-	//resp, err := decoder.wm.Api.SendTransaction(decoder.wm.Context, transaction)
 	if err != nil {
 		return nil, err
 	}
@@ -404,6 +397,11 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 	rawTx.IsSubmit = true
 
 	decimals := decoder.wm.Decimal()
+
+	err = wrapper.SetAddressExtParam(rawTx.Signatures[rawTx.Account.AccountID][0].Address.Address, decoder.wm.FullName(), rawTx.Signatures[rawTx.Account.AccountID][0].Nonce)
+	if err != nil {
+		return nil, err
+	}
 
 	//记录一个交易单
 	tx := &openwallet.Transaction{
@@ -514,7 +512,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransaction(wrapper openwalle
 			rawTx,
 			addrBalance,
 			feeInfo,
-			"")
+			"", nil)
 		if createErr != nil {
 			return nil, createErr
 		}
