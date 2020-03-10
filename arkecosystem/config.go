@@ -25,7 +25,6 @@ fixFees = "0.00002"
 )
 
 type WalletConfig struct {
-
 	//币种
 	Symbol string
 	//配置文件路径
@@ -48,6 +47,9 @@ type WalletConfig struct {
 	FixFees string
 	//数据目录
 	DataDir string
+
+	//保存nonce的map
+	NonceMap map[string]uint64
 }
 
 func NewConfig(symbol string) *WalletConfig {
@@ -69,13 +71,12 @@ func NewConfig(symbol string) *WalletConfig {
 	//钱包服务API
 	c.ServerAPI = ""
 
+	c.NonceMap = make(map[string]uint64)
 	//创建目录
 	//file.MkdirAll(c.dbPath)
 
 	return &c
 }
-
-
 
 //创建文件夹
 func (wc *WalletConfig) makeDataDir() {

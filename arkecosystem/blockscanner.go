@@ -178,7 +178,6 @@ func (bs *ARKBlockScanner) GetBalanceByAddress(address ...string) ([]*openwallet
 				Balance:          ub.String(),
 				UnconfirmBalance: ub.String(),
 				ConfirmBalance:   b.String(),
-
 			}
 
 			//log.Warn("address:",a,",ubalance:",ub.String(),"confirmBlance:",b.String())

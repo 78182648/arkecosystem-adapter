@@ -11,7 +11,6 @@ import (
 	"github.com/blocktree/arkecosystem-adapter/sdk/crypto"
 	"github.com/blocktree/go-owcrypt"
 	"github.com/blocktree/openwallet/common"
-	ow "github.com/blocktree/openwallet/common"
 	"github.com/blocktree/openwallet/log"
 	"github.com/blocktree/openwallet/openwallet"
 	"github.com/shopspring/decimal"
@@ -109,26 +108,14 @@ func (decoder *TransactionDecoder) CreateRawTransaction(wrapper openwallet.Walle
 	if findAddrBalance == nil {
 		return fmt.Errorf("all address's balance of account is not enough")
 	}
-	var nonce uint64
-	//获取db记录的nonce并确认nonce值
-	nonce_db, err := wrapper.GetAddressExtParam(findAddrBalance.Address, decoder.wm.FullName())
-	if err != nil {
-		return err
-	}
-	//判断nonce_db是否为空,为空则说明当前nonce是0
-	if nonce_db == nil {
-		nonce = 0
-	} else {
-		nonce = ow.NewString(nonce_db).UInt64()
-	}
-	nonce = nonce + 1
+
 	//最后创建交易单
 	err = decoder.createRawTransaction(
 		wrapper,
 		rawTx,
 		findAddrBalance,
 		fixFees,
-		"", &nonce)
+		"", 0)
 	if err != nil {
 		return err
 	}
@@ -143,7 +130,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	rawTx *openwallet.RawTransaction,
 	addrBalance *openwallet.Balance,
 	feeInfo *big.Int,
-	callData string, nonce *uint64) error {
+	callData string, nonce uint64) error {
 
 	var (
 		accountTotalSent = decimal.Zero
@@ -160,11 +147,6 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	} else {
 		decimals = decoder.wm.Decimal()
 	}
-	//isContract := rawTx.Coin.IsContract
-	//contractAddress := rawTx.Coin.Contract.Address
-	//tokenCoin := rawTx.Coin.Contract.Token
-	//tokenDecimals := int(rawTx.Coin.Contract.Decimals)
-	//coinDecimals := this.wm.Decimal()
 
 	for k, v := range rawTx.To {
 		destination = k
@@ -202,12 +184,22 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	if err != nil {
 		return err
 	}
-	if nonce == nil {
+	if nonce == 0 {
 
-		nonce = &addressWallet.Data.Nonce
+		nonce = addressWallet.Data.Nonce
 	}
 
-	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address, *nonce)
+	//获取db记录的nonce并确认nonce值
+	nonce_db, ok := decoder.wm.Config.NonceMap[addr.Address]
+	if ok && nonce != 0 {
+		nonce = nonce_db
+	} else {
+		nonce = addressWallet.Data.Nonce
+	}
+
+	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address, nonce)
+
+	decoder.wm.Config.NonceMap[transaction.SenderId] = transaction.Nonce
 
 	txRaw, err := transaction.ToJson()
 	if err != nil {
@@ -232,7 +224,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 		EccType: decoder.wm.Config.CurveType,
 		Address: addr,
 		Message: hex.EncodeToString(hashBytes),
-		Nonce:   strconv.FormatUint(*nonce, 10),
+		Nonce:   strconv.FormatUint(nonce, 10),
 	}
 	keySignList = append(keySignList, &signature)
 
@@ -398,11 +390,6 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 
 	decimals := decoder.wm.Decimal()
 
-	err = wrapper.SetAddressExtParam(rawTx.Signatures[rawTx.Account.AccountID][0].Address.Address, decoder.wm.FullName(), rawTx.Signatures[rawTx.Account.AccountID][0].Nonce)
-	if err != nil {
-		return nil, err
-	}
-
 	//记录一个交易单
 	tx := &openwallet.Transaction{
 		From:       rawTx.TxFrom,
@@ -512,7 +499,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransaction(wrapper openwalle
 			rawTx,
 			addrBalance,
 			feeInfo,
-			"", nil)
+			"", 0)
 		if createErr != nil {
 			return nil, createErr
 		}
