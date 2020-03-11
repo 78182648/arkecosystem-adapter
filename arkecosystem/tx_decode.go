@@ -189,17 +189,36 @@ func (decoder *TransactionDecoder) createRawTransaction(
 		nonce = addressWallet.Data.Nonce
 	}
 
+	//wrapper.SetAddressExtParam(addr.Address,"nonce",common.NewStringByUInt(69))
 	//获取db记录的nonce并确认nonce值
-	nonce_db, ok := decoder.wm.Config.NonceMap[addr.Address]
-	if ok && nonce != 0 {
-		nonce = nonce_db
+	//nonce_db, ok := decoder.wm.Config.NonceMap[addr.Address]
+	//if ok && nonce != 0 {
+	//	nonce = nonce_db
+	//} else {
+	//wrapper.SetAddressExtParam(addr.Address, "nonce",nil)
+
+	nonceParamter, err := wrapper.GetAddressExtParam(addr.Address, "nonce")
+	if err != nil || nonceParamter == nil {
+		nonce = addressWallet.Data.Nonce
 	} else {
+
+		nonceTemp, err := strconv.Atoi(nonceParamter.(string))
+		if err == nil {
+			nonce = uint64(nonceTemp)
+		} else {
+			nonce = addressWallet.Data.Nonce
+		}
+	}
+
+	if nonce == 0{
 		nonce = addressWallet.Data.Nonce
 	}
+	//}
 
 	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address, nonce)
 
 	decoder.wm.Config.NonceMap[transaction.SenderId] = transaction.Nonce
+	wrapper.SetAddressExtParam(addr.Address, "nonce", common.NewStringByUInt(transaction.Nonce))
 
 	txRaw, err := transaction.ToJson()
 	if err != nil {
