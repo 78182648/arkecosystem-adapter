@@ -197,7 +197,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	//} else {
 	//wrapper.SetAddressExtParam(addr.Address, "nonce",nil)
 
-	nonceParamter, err := wrapper.GetAddressExtParam(addr.Address, "nonce")
+	nonceParamter, err := wrapper.GetAddressExtParam(addr.Address, "nonceNew")
 	if err != nil || nonceParamter == nil {
 		nonce = addressWallet.Data.Nonce
 	} else {
@@ -218,7 +218,7 @@ func (decoder *TransactionDecoder) createRawTransaction(
 	transaction := crypto.BuildTransferMySelf(destination, crypto.FlexToshi(amount.Uint64()), addr.PublicKey, addr.Address, nonce)
 
 	decoder.wm.Config.NonceMap[transaction.SenderId] = transaction.Nonce
-	wrapper.SetAddressExtParam(addr.Address, "nonce", common.NewStringByUInt(transaction.Nonce))
+
 
 	txRaw, err := transaction.ToJson()
 	if err != nil {
@@ -409,6 +409,7 @@ func (decoder *TransactionDecoder) SubmitRawTransaction(wrapper openwallet.Walle
 
 	decimals := decoder.wm.Decimal()
 
+	wrapper.SetAddressExtParam(serializableTransaction.SenderId, "nonceNew", common.NewStringByUInt(serializableTransaction.Nonce))
 	//记录一个交易单
 	tx := &openwallet.Transaction{
 		From:       rawTx.TxFrom,
