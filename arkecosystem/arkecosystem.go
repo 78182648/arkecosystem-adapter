@@ -2,8 +2,8 @@ package arkecosystem
 
 import (
 	"github.com/astaxie/beego/config"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 //CurveType 曲线类型
@@ -44,7 +44,7 @@ func (wm *WalletManager) GetTransactionDecoder() openwallet.TransactionDecoder {
 //GetBlockScanner 获取区块链
 func (wm *WalletManager) GetBlockScanner() openwallet.BlockScanner {
 
-	return  wm.Blockscanner
+	return wm.Blockscanner
 	//return nil
 }
 

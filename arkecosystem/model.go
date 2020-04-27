@@ -2,17 +2,10 @@ package arkecosystem
 
 import (
 	"fmt"
-	"github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/crypto"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/crypto"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
-
-
-
-
-
-
-
 
 //UnscanRecords 扫描失败的区块及交易
 type UnscanRecord struct {

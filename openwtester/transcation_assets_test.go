@@ -16,9 +16,9 @@
 package openwtester
 
 import (
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openw"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openw"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"testing"
 )
 
@@ -116,7 +116,6 @@ func testSubmitTransactionStep(tm *openw.WalletManager, rawTx *openwallet.RawTra
 	return rawTx, nil
 }
 
-
 func TestTransfer(t *testing.T) {
 	tm := testInitWalletManager()
 	walletID := "WMSVS51x4XgWNgd354yxd4yC7CrESsA8dN"
@@ -129,36 +128,36 @@ func TestTransfer(t *testing.T) {
 		//"ARyLumALdp5nVCaUeVQebjd7kAkPDfFkBN",
 		//"ARppp4adUpoRW9dk7Vn2gGUasNSesb4dhr",
 		//"ATAineEreLjeFVfnAzxL9XnKAsHY5PziMJ",
-		"AZ79g3MbL1BR95KYrzGT3WZriPRHzpsikb",
-		"Aa8NVJUW6tnbdoYYRmwYgV5TdFXhDvAJXA",
-
+		"AXDuaEtps2yWjE2VydaVCahwbiueZAdnSG",
+		"AXE85jSY3L5YBLRh9UZsYYZWEUZMHexBih",
+		"AXDzyPuPMqTpphPo6TzKeKJKPqWJ1ugThH",
 	}
 
-    for i:=0 ; i< len(address); i++{
-	to := address[i %len(address)]
-	testGetAssetsAccountBalance(tm, walletID, accountID)
+	for i := 0; i < len(address); i++ {
+		to := address[i%len(address)]
+		testGetAssetsAccountBalance(tm, walletID, accountID)
 
-	rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.1", "", "", nil)
-	if err != nil {
-		return
-	}
+		rawTx, err := testCreateTransactionStep(tm, walletID, accountID, to, "0.2", "", "", nil)
+		if err != nil {
+			return
+		}
 
-	log.Std.Info("rawTx: %+v", rawTx)
+		log.Std.Info("rawTx: %+v", rawTx)
 
-	_, err = testSignTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
+		_, err = testSignTransactionStep(tm, rawTx)
+		if err != nil {
+			return
+		}
 
-	_, err = testVerifyTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
+		_, err = testVerifyTransactionStep(tm, rawTx)
+		if err != nil {
+			return
+		}
 
-	_, err = testSubmitTransactionStep(tm, rawTx)
-	if err != nil {
-		return
-	}
+		_, err = testSubmitTransactionStep(tm, rawTx)
+		if err != nil {
+			return
+		}
 	}
 }
 
@@ -177,11 +176,11 @@ func TestSummary(t *testing.T) {
 	//	Decimals: 4,
 	//}
 
-	testGetAssetsAccountBalance(tm, walletID, accountID)
+	//testGetAssetsAccountBalance(tm, walletID, accountID)
 
 	rawTxArray, err := testCreateSummaryTransactionStep(tm, walletID, accountID,
 		summaryAddress, "", "", "",
-		0, 100, nil)
+		4002, 100, nil)
 	if err != nil {
 		log.Errorf("CreateSummaryTransaction failed, unexpected error: %v", err)
 		return
@@ -206,4 +205,3 @@ func TestSummary(t *testing.T) {
 	}
 
 }
-

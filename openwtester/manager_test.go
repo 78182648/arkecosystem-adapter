@@ -4,16 +4,15 @@ import (
 	"path/filepath"
 	"testing"
 
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openw"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openw"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 var (
 	testApp        = "assets-adapter"
 	configFilePath = filepath.Join("conf")
 )
-
 
 func testInitWalletManager() *openw.WalletManager {
 	log.SetLogFuncCall(true)
@@ -115,7 +114,7 @@ func TestWalletManager_CreateAddress(t *testing.T) {
 
 	walletID := "WMSVS51x4XgWNgd354yxd4yC7CrESsA8dN"
 	accountID := "GF3DqiUyNQi2RBqDC7KPJZ5SpARdy51Qn5tH4E5JBrgu"
-	address, err := tm.CreateAddress(testApp, walletID, accountID, 5)
+	address, err := tm.CreateAddress(testApp, walletID, accountID, 2000)
 	if err != nil {
 		log.Error(err)
 		return
@@ -133,7 +132,7 @@ func TestWalletManager_GetAddressList(t *testing.T) {
 	walletID := "WMSVS51x4XgWNgd354yxd4yC7CrESsA8dN"
 	accountID := "4bpD665trhfF69MeZQUj5hpCqogfetEwWoGTrRMSuxvV"
 	accountID = "GF3DqiUyNQi2RBqDC7KPJZ5SpARdy51Qn5tH4E5JBrgu"
-	list, err := tm.GetAddressList(testApp, walletID, accountID, 0, -1, false)
+	list, err := tm.GetAddressList(testApp, walletID, accountID, 4000, 5, false)
 	if err != nil {
 		log.Error("unexpected error:", err)
 		return

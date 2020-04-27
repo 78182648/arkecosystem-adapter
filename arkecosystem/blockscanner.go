@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"github.com/blocktree/arkecosystem-adapter/sdk/client"
-	"github.com/blocktree/openwallet/common"
-	"github.com/blocktree/openwallet/log"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/common"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 	"github.com/pkg/errors"
 	"math/big"
 	"time"
@@ -107,7 +107,6 @@ func (bs *ARKBlockScanner) getBlockByHeight(height uint64) (*client.Block, error
 	return &result.Data[0], nil
 }
 
-
 //GetScannedBlockHeader 获取当前扫描的区块头
 func (bs *ARKBlockScanner) GetScannedBlockHeader() (*openwallet.BlockHeader, error) {
 
@@ -118,7 +117,7 @@ func (bs *ARKBlockScanner) GetScannedBlockHeader() (*openwallet.BlockHeader, err
 		err         error
 	)
 
-	blockHeight, hash,_ = bs.GetLocalBlockHead()
+	blockHeight, hash, _ = bs.GetLocalBlockHead()
 
 	//如果本地没有记录，查询接口的高度
 	if blockHeight == 0 {
@@ -192,7 +191,7 @@ func (bs *ARKBlockScanner) GetBalanceByAddress(address ...string) ([]*openwallet
 
 //GetScannedBlockHeight 获取已扫区块高度
 func (bs *ARKBlockScanner) GetScannedBlockHeight() uint64 {
-	localHeight, _,_ := bs.GetLocalBlockHead()
+	localHeight, _, _ := bs.GetLocalBlockHead()
 	return localHeight
 }
 
@@ -329,8 +328,8 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 	//	return resultTx, err
 	//}
 	//feeDec :=
-	amount := common.IntToDecimals(int64(v.Amount),  bs.wm.Decimal()).String()
-	fees := common.IntToDecimals(int64(v.Fee),  bs.wm.Decimal()).String()
+	amount := common.IntToDecimals(int64(v.Amount), bs.wm.Decimal()).String()
+	fees := common.IntToDecimals(int64(v.Fee), bs.wm.Decimal()).String()
 	from := v.Sender
 	to := v.Recipient
 
@@ -440,7 +439,6 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 //newExtractDataNotify 发送通知
 func (bs *ARKBlockScanner) newExtractDataNotify(height uint64, extractTxResult []*ExtractTxResult) error {
 
-
 	for o, _ := range bs.Observers {
 		for _, txResult := range extractTxResult {
 			for key, data := range txResult.extractData {
@@ -448,7 +446,7 @@ func (bs *ARKBlockScanner) newExtractDataNotify(height uint64, extractTxResult [
 				if err != nil {
 					bs.wm.Log.Error("BlockExtractDataNotify unexpected error:", err)
 					txID := ""
-					if data != nil &&  data.Transaction != nil{
+					if data != nil && data.Transaction != nil {
 						txID = data.Transaction.TxID
 					}
 					//记录未扫区块
@@ -769,7 +767,7 @@ func (bs *ARKBlockScanner) SetRescanBlockHeight(height uint64) error {
 //ExtractTransactionData
 func (bs *ARKBlockScanner) ExtractTransactionData(txid string, scanAddressFunc openwallet.BlockScanTargetFunc) (map[string][]*openwallet.TxExtractData, error) {
 
-	query := &client.Pagination{Limit: 1,}
+	query := &client.Pagination{Limit: 1}
 
 	trans, _, err := bs.wm.Api.Client.Transactions.ListById(bs.wm.Context, query, txid)
 
@@ -801,6 +799,7 @@ func (bs *ARKBlockScanner) ExtractTransactionData(txid string, scanAddressFunc o
 	}
 	return extData, nil
 }
+
 //SupportBlockchainDAI 支持外部设置区块链数据访问接口
 //@optional
 func (bs *ARKBlockScanner) SupportBlockchainDAI() bool {

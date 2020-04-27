@@ -3,7 +3,7 @@ package arkecosystem
 import (
 	"fmt"
 	"github.com/blocktree/arkecosystem-adapter/sdk/client"
-	"github.com/blocktree/openwallet/openwallet"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 //SaveLocalBlockHead 记录区块高度和hash到本地
@@ -69,8 +69,8 @@ func (bs *ARKBlockScanner) GetLocalBlock(height uint64) (*client.Block, error) {
 	}
 
 	block := &client.Block{
-		Id: header.Hash,
-		Height: int64( header.Height),
+		Id:     header.Hash,
+		Height: int64(header.Height),
 	}
 
 	return block, nil

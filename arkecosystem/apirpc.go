@@ -20,11 +20,10 @@ import (
 	"sync"
 	"time"
 
-	"github.com/blocktree/openwallet/log"
+	"github.com/blocktree/openwallet/v2/log"
 	"github.com/imroc/req"
 	"github.com/tidwall/gjson"
 )
-
 
 type Client struct {
 	BaseURL   string
@@ -39,7 +38,6 @@ type Response struct {
 	Version string      `json:"jsonrpc"`
 	Result  interface{} `json:"result"`
 }
-
 
 //func (this *Client) PushTransaction(packedTx interface{}) (*crypto.Transaction, error) {
 //	params := []interface{}{

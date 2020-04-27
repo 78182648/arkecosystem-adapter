@@ -2,7 +2,8 @@ package arkecosystem_addrec
 
 import (
 	"github.com/blocktree/arkecosystem-adapter/sdk/crypto2"
-	"github.com/blocktree/openwallet/log"
+	"github.com/blocktree/openwallet/v2/log"
+	"github.com/blocktree/openwallet/v2/openwallet"
 )
 
 var (
@@ -11,7 +12,7 @@ var (
 
 //AddressDecoderV2
 type AddressDecoderV2 struct {
-	IsTestNet bool
+	*openwallet.AddressDecoderV2Base
 }
 
 // GetAddressFromPublicKey takes a Lisk public key and returns the associated address
@@ -30,4 +31,12 @@ func GetAddressFromPublicKey(publicKey []byte) string {
 func (dec *AddressDecoderV2) AddressEncode(hash []byte, opts ...interface{}) (string, error) {
 	address := GetAddressFromPublicKey(hash)
 	return address, nil
+}
+
+
+
+// AddressVerify 地址校验
+func (dec *AddressDecoderV2) AddressVerify(address string, opts ...interface{}) bool {
+
+	return true
 }
