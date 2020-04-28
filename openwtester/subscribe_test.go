@@ -79,7 +79,7 @@ func TestSubscribeAddress_ARK(t *testing.T) {
 		endRunning = make(chan bool, 1)
 		symbol     = "ARK"
 		addrs      = map[string]string{
-			"AYRoQKcqehgJnLRhZMtptfSKAzw2vkamuH": "AYRoQKcqehgJnLRhZMtptfSKAzw2vkamuH",
+			"AcvzY2t2yujqs9feQvEuVvjZdkW5xYS68m": "AcvzY2t2yujqs9feQvEuVvjZdkW5xYS68m",
 			//"eostesterbob": "sender",
 		}
 	)
@@ -133,6 +133,7 @@ func TestSubscribeAddress_ARK(t *testing.T) {
 		return
 	}
 
+	scanner.SetRescanBlockHeight(12094803)
 	scanner.SetBlockScanTargetFunc(scanTargetFunc)
 
 	sub := subscriberSingle{}

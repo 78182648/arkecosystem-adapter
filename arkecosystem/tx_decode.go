@@ -483,6 +483,7 @@ func (decoder *TransactionDecoder) CreateSummaryRawTransaction(wrapper openwalle
 		fixFees = common.StringNumToBigIntWithExp(decoder.wm.Config.FixFees, decimals)
 	}
 
+
 	//计算手续费
 	feeInfo = fixFees
 	for _, addrBalance := range addrBalanceArray {

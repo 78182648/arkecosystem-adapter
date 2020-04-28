@@ -337,6 +337,8 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 		openwallet.ScanTarget{
 			Address:          from,
 			BalanceModelType: openwallet.BalanceModelTypeAddress,
+			Symbol:bs.wm.Symbol(),
+
 		})
 	if ok {
 		input := openwallet.TxInput{}
@@ -765,7 +767,7 @@ func (bs *ARKBlockScanner) SetRescanBlockHeight(height uint64) error {
 }
 
 //ExtractTransactionData
-func (bs *ARKBlockScanner) ExtractTransactionData(txid string, scanAddressFunc openwallet.BlockScanTargetFunc) (map[string][]*openwallet.TxExtractData, error) {
+func (bs *ARKBlockScanner) ExtractTransactionData(txid string, scanTargetFunc openwallet.BlockScanTargetFunc) (map[string][]*openwallet.TxExtractData, error) {
 
 	query := &client.Pagination{Limit: 1}
 
@@ -784,7 +786,7 @@ func (bs *ARKBlockScanner) ExtractTransactionData(txid string, scanAddressFunc o
 	if err != nil {
 		return nil, err
 	}
-	result, err := bs.ExtractTransactionSingleTx(block, &tx, scanAddressFunc)
+	result, err := bs.ExtractTransactionSingleTx(block, &tx, scanTargetFunc)
 	if err != nil {
 		return nil, err
 	}
