@@ -375,6 +375,7 @@ func (bs *ARKBlockScanner) changeTrans(trans *client.Transaction, scanTargetFunc
 		openwallet.ScanTarget{
 			Address:          v.Recipient,
 			BalanceModelType: openwallet.BalanceModelTypeAddress,
+			Symbol:bs.wm.Symbol(),
 		})
 	if ok2 {
 		output := openwallet.TxOutPut{}
